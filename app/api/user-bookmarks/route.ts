@@ -1,10 +1,12 @@
-import { createServerClient } from "@/lib/supabase/server" // Changed import to createServerClient
+import { createServerClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
-import { cookies } from "next/headers" // Added import for cookies
 
 export async function GET() {
-  const cookieStore = cookies() // Get cookieStore
-  const { supabase } = createServerClient(cookieStore) // Updated createClient call to createServerClient
+  const supabase = createServerClient()
+
+  if (!supabase) {
+    return NextResponse.json({ error: "Supabase is not configured" }, { status: 500 })
+  }
 
   const {
     data: { user },
