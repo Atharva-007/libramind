@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { ChallengeCard } from "@/components/challenge-card"
-import { SocialShare } from "@/components/social-share" // Import SocialShare component
+import { SocialShare } from "@/components/social-share"
+import { ModernNavigation } from "@/components/navigation/modern-navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { motion } from "framer-motion"
 
 interface Challenge {
   id: string
@@ -111,59 +117,190 @@ export default function ChallengesPage() {
     }
   }
 
-  if (loading) return <div className="text-center text-foreground">Loading challenges...</div>
-  if (error) return <div className="text-center text-red-500">Error: {error}</div>
-
   const availableChallenges = allChallenges.filter(
     (challenge) => !userChallenges.some((uc) => uc.challenge_id === challenge.id),
   )
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ModernNavigation />
+        <main className="pt-20 pb-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ModernNavigation />
+        <main className="pt-20 pb-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardContent className="p-12 text-center">
+                <div className="text-6xl mb-4">❌</div>
+                <h2 className="text-2xl font-bold mb-4">Error Loading Challenges</h2>
+                <p className="text-muted-foreground mb-6">{error}</p>
+                <Button onClick={() => window.location.reload()}>
+                  🔄 Try Again
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-foreground mb-8 text-center">Reading Challenges</h1>
+    <div className="min-h-screen bg-background">
+      <ModernNavigation />
 
-      {userChallenges.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Your Challenges</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userChallenges.map((uc) => (
-              <ChallengeCard
-                key={uc.id}
-                challenge={uc.reading_challenges}
-                userChallenge={uc}
-                onJoinChallenge={handleJoinChallenge}
-                onUpdateProgress={handleUpdateProgress}
-              />
-            ))}
+      <main className="pt-20 pb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <motion.h1
+              className="text-4xl font-bold mb-4"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              🏆 Reading Challenges
+            </motion.h1>
+            <motion.p
+              className="text-xl text-muted-foreground"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              Push your reading limits and achieve your literary goals
+            </motion.p>
           </div>
-          <div className="mt-8 flex justify-center">
-            <SocialShare
-              title="I'm participating in reading challenges on my reading app!"
-              url={shareUrl}
-            />
-          </div>
-        </section>
-      )}
 
-      {availableChallenges.length > 0 && (
-        <section>
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Available Challenges</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableChallenges.map((challenge) => (
-              <ChallengeCard
-                key={challenge.id}
-                challenge={challenge}
-                onJoinChallenge={handleJoinChallenge}
-                onUpdateProgress={handleUpdateProgress}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+          {/* Challenge Stats */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-primary">{userChallenges.length}</div>
+                <div className="text-sm text-muted-foreground">Active Challenges</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {userChallenges.reduce((sum, uc) => sum + uc.books_read, 0)}
+                </div>
+                <div className="text-sm text-muted-foreground">Books Completed</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-primary">{availableChallenges.length}</div>
+                <div className="text-sm text-muted-foreground">Available Challenges</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-      {userChallenges.length === 0 && availableChallenges.length === 0 && (
-        <p className="text-center text-muted-foreground">No reading challenges available at the moment.</p>
-      )}
-    </main>
+          {userChallenges.length > 0 && (
+            <motion.section
+              className="mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-semibold">🌟 Your Active Challenges</h2>
+                <Badge variant="secondary">
+                  {userChallenges.length} Active
+                </Badge>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userChallenges.map((uc, index) => (
+                  <motion.div
+                    key={uc.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                  >
+                    <ChallengeCard
+                      challenge={uc.reading_challenges}
+                      userChallenge={uc}
+                      onJoinChallenge={handleJoinChallenge}
+                      onUpdateProgress={handleUpdateProgress}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+              <motion.div
+                className="mt-8 flex justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
+                <SocialShare
+                  title="I'm participating in reading challenges on LibraMind Pro!"
+                  url={shareUrl}
+                />
+              </motion.div>
+            </motion.section>
+          )}
+
+          {availableChallenges.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-semibold">🚀 Discover New Challenges</h2>
+                <Badge variant="outline">
+                  {availableChallenges.length} Available
+                </Badge>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {availableChallenges.map((challenge, index) => (
+                  <motion.div
+                    key={challenge.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                  >
+                    <ChallengeCard
+                      challenge={challenge}
+                      onJoinChallenge={handleJoinChallenge}
+                      onUpdateProgress={handleUpdateProgress}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {userChallenges.length === 0 && availableChallenges.length === 0 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <div className="text-6xl mb-4">📚</div>
+                <h2 className="text-2xl font-bold mb-4">No Challenges Available</h2>
+                <p className="text-muted-foreground">
+                  No reading challenges available at the moment. Check back soon!
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </main>
+    </div>
   )
 }
