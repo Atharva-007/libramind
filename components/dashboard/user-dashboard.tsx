@@ -3,6 +3,10 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { PDFUploader } from '@/components/pdf/PDFUploader'
+import ChatDashboard from '@/components/chat/ChatDashboard'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { useTranslation } from 'react-i18next'
 // import { User } from '@supabase/supabase-js'
 
 interface User {
@@ -34,9 +38,11 @@ import {
     FaSignOutAlt as LogOut
 } from 'react-icons/fa'
 import { FadeInAnimation, StaggerAnimation, StaggerItem, ScaleAnimation } from '@/components/animations/layout-animations'
-import { ShineEffect, FloatingAnimation } from '@/components/animations/micro-animations'
+import { ShineEffect } from '@/components/animations/micro-animations'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FileText, MessageCircle, Languages, Brain } from 'lucide-react'
 
 interface UserStats {
     booksRead: number
@@ -357,6 +363,53 @@ export function UserDashboard() {
                                 <span>{50 - stats.booksRead} books remaining</span>
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+            </FadeInAnimation>
+
+            {/* New Features Section */}
+            <FadeInAnimation delay={0.6}>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="flex items-center">
+                            <Brain className="w-5 h-5 mr-2" />
+                            LibraMind Pro Features
+                        </CardTitle>
+                        <LanguageSwitcher />
+                    </CardHeader>
+                    <CardContent>
+                        <Tabs defaultValue="pdf" className="w-full">
+                            <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="pdf" className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4" />
+                                    PDF Reader
+                                </TabsTrigger>
+                                <TabsTrigger value="chat" className="flex items-center gap-2">
+                                    <MessageCircle className="w-4 h-4" />
+                                    AI Chat
+                                </TabsTrigger>
+                                <TabsTrigger value="library" className="flex items-center gap-2">
+                                    <Book className="w-4 h-4" />
+                                    Library
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="pdf" className="mt-6">
+                                <PDFUploader />
+                            </TabsContent>
+
+                            <TabsContent value="chat" className="mt-6">
+                                <ChatDashboard />
+                            </TabsContent>
+
+                            <TabsContent value="library" className="mt-6">
+                                <div className="text-center py-8">
+                                    <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                                    <h3 className="text-lg font-medium mb-2">Enhanced Library Coming Soon</h3>
+                                    <p className="text-muted-foreground">Advanced book management and reading analytics</p>
+                                </div>
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
                 </Card>
             </FadeInAnimation>
