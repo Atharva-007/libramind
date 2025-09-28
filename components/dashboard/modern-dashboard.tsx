@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -14,18 +14,17 @@ import {
     FaClock as Clock,
     FaBullseye as Target,
     FaUsers as Users,
-    FaBookmark as Bookmark,
     FaStar as Star,
     FaChevronRight as ChevronRight,
     FaFire as Flame,
     FaBolt as Zap,
     FaAward as Award,
-    FaCalendar as Calendar,
     FaBookOpen as BookOpen,
     FaEye as Eye
 } from 'react-icons/fa'
 import { FadeInAnimation, StaggerAnimation, StaggerItem, ScaleAnimation } from '@/components/animations/layout-animations'
 import { ShineEffect, FloatingAnimation } from '@/components/animations/micro-animations'
+import { FeaturedPDFSlider } from '@/components/pdf/FeaturedPDFSlider'
 
 interface DashboardStats {
     booksRead: number
@@ -56,7 +55,7 @@ interface RecentActivity {
 }
 
 export function ModernDashboard() {
-    const [stats, setStats] = useState<DashboardStats>({
+    const [stats] = useState<DashboardStats>({
         booksRead: 24,
         pagesRead: 8432,
         readingStreak: 12,
@@ -170,7 +169,7 @@ export function ModernDashboard() {
                                 Welcome back, Reader! 👋
                             </h1>
                             <p className="text-lg text-primary-foreground/90 mb-6">
-                                You're on a {stats.readingStreak}-day reading streak. Keep the momentum going!
+                                You&apos;re on a {stats.readingStreak}-day reading streak. Keep the momentum going!
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <Button variant="secondary" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
@@ -195,10 +194,14 @@ export function ModernDashboard() {
                 </div>
             </FadeInAnimation>
 
+            <FadeInAnimation delay={0.2}>
+                <FeaturedPDFSlider />
+            </FadeInAnimation>
+
             {/* Stats Grid */}
             <StaggerAnimation>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {statCards.map((stat, index) => (
+                    {statCards.map((stat) => (
                         <StaggerItem key={stat.title}>
                             <ShineEffect>
                                 <ScaleAnimation>
@@ -375,8 +378,8 @@ export function ModernDashboard() {
                                         <p className="text-xs text-muted-foreground">{activity.time}</p>
                                     </div>
                                     <div className={`w-2 h-2 rounded-full ${activity.type === 'finished' ? 'bg-green-500' :
-                                            activity.type === 'reading' ? 'bg-blue-500' :
-                                                activity.type === 'goal' ? 'bg-yellow-500' : 'bg-purple-500'
+                                        activity.type === 'reading' ? 'bg-blue-500' :
+                                            activity.type === 'goal' ? 'bg-yellow-500' : 'bg-purple-500'
                                         }`} />
                                 </motion.div>
                             ))}

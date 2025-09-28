@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -38,16 +38,17 @@ import {
     Bell,
     Bookmark,
     TrendingUp,
-    Zap,
-    Sparkles
+
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 const navigationItems = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/reading-list', label: 'Library', icon: Library },
+    { href: '/library', label: 'Library', icon: Library },
     { href: '/challenges', label: 'Challenges', icon: Trophy },
     { href: '/community', label: 'Community', icon: MessageSquare },
+    { href: '/profile', label: 'Profile', icon: User },
+    { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export function ModernNavigation() {
@@ -67,8 +68,8 @@ export function ModernNavigation() {
     return (
         <motion.header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg'
-                    : 'bg-transparent'
+                ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg'
+                : 'bg-transparent'
                 }`}
             initial={{ y: -100 }}
             animate={{ y: 0 }}
@@ -119,8 +120,8 @@ export function ModernNavigation() {
                                     <Link
                                         href={item.href}
                                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative overflow-hidden ${isActive
-                                                ? 'text-primary bg-primary/10'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                                            ? 'text-primary bg-primary/10'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                                             }`}
                                     >
                                         <item.icon className="w-4 h-4" />
@@ -216,9 +217,11 @@ export function ModernNavigation() {
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>Profile</span>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/profile" className="flex items-center">
+                                        <User className="mr-2 h-4 w-4" />
+                                        <span>Profile</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Bookmark className="mr-2 h-4 w-4" />
@@ -228,9 +231,11 @@ export function ModernNavigation() {
                                     <TrendingUp className="mr-2 h-4 w-4" />
                                     <span>Reading Stats</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Settings className="mr-2 h-4 w-4" />
-                                    <span>Settings</span>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/settings" className="flex items-center">
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        <span>Settings</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
@@ -280,8 +285,8 @@ export function ModernNavigation() {
                                                         key={item.href}
                                                         href={item.href}
                                                         className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                                                                ? 'text-primary bg-primary/10'
-                                                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                                                            ? 'text-primary bg-primary/10'
+                                                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                                                             }`}
                                                     >
                                                         <item.icon className="w-5 h-5" />

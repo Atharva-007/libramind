@@ -7,6 +7,7 @@ import { Suspense } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { QueryClientProvider } from "@/lib/query-client"
 import { Toaster } from "@/components/ui/sonner"
+import ClientI18nProvider from "@/components/ClientI18nProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -44,18 +45,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
         <QueryClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>
-              {children}
-            </Suspense>
-            <Toaster />
-            {/* <Analytics /> */}
-          </ThemeProvider>
+          <ClientI18nProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>
+                {children}
+              </Suspense>
+              <Toaster />
+              {/* <Analytics /> */}
+            </ThemeProvider>
+          </ClientI18nProvider>
         </QueryClientProvider>
       </body>
     </html>

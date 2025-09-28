@@ -1,0 +1,2 @@
+ALTER TABLE user_pdfs
+ADD COLUMN IF NOT EXISTS storage_path TEXT;
