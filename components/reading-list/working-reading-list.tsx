@@ -1,13 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Select,
     SelectContent,
@@ -17,19 +15,18 @@ import {
 } from '@/components/ui/select'
 import {
     Search,
-    Filter,
     Bookmark,
     Star,
     Book,
-    Heart,
     Eye,
-    Clock
+    Heart
 } from 'lucide-react'
 import { ModernNavigation } from '@/components/navigation/modern-navigation'
 import { FadeInAnimation, StaggerAnimation, StaggerItem } from '@/components/animations/layout-animations'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 interface BookType {
     id: string
@@ -48,27 +45,16 @@ export default function WorkingReadingListPage() {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedGenre, setSelectedGenre] = useState<string>('all')
-    const [user, setUser] = useState<any>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [userBookmarks, setUserBookmarks] = useState<string[]>([])
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
-    useEffect(() => {
-        checkUser()
-        loadBooks()
-    }, [])
-
-    useEffect(() => {
-        if (user) {
-            loadUserBookmarks()
-        }
-    }, [user])
-
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
         setUser(user)
-    }
+    }, [supabase])
 
-    const loadBooks = async () => {
+    const loadBooks = useCallback(async () => {
         try {
             const response = await fetch('/api/books')
             if (response.ok) {
@@ -80,9 +66,9 @@ export default function WorkingReadingListPage() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
 
-    const loadUserBookmarks = async () => {
+    const loadUserBookmarks = useCallback(async () => {
         try {
             const response = await fetch('/api/user-bookmarks')
             if (response.ok) {
@@ -92,7 +78,18 @@ export default function WorkingReadingListPage() {
         } catch (error) {
             console.error('Error loading bookmarks:', error)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        checkUser()
+        loadBooks()
+    }, [checkUser, loadBooks])
+
+    useEffect(() => {
+        if (user) {
+            loadUserBookmarks()
+        }
+    }, [user, loadUserBookmarks])
 
     const toggleBookmark = async (bookId: string) => {
         if (!user) return
@@ -209,7 +206,7 @@ export default function WorkingReadingListPage() {
                     {/* Books Grid */}
                     <StaggerAnimation>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredBooks.map((book, index) => (
+                            {filteredBooks.map((book) => (
                                 <StaggerItem key={book.id}>
                                     <motion.div
                                         whileHover={{ scale: 1.02 }}

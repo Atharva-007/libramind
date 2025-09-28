@@ -9,10 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@aws-sdk/client-s3": "^3.896.0",
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
     "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",

@@ -1,10 +1,6 @@
 'use client'
 
-<<<<<<< HEAD
 import { useState, useCallback, useEffect } from 'react'
-=======
-import { useState, useCallback } from 'react'
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 import { useDropzone } from 'react-dropzone'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,7 +22,6 @@ interface UploadedPDF {
     uploadDate: string
 }
 
-<<<<<<< HEAD
 interface ApiPdfRow {
     id: string
     filename: string
@@ -37,9 +32,6 @@ interface ApiPdfRow {
     upload_date?: string
     created_at?: string
 }
-
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 export function PDFUploader() {
     const { t } = useTranslation()
     const [uploadedPDFs, setUploadedPDFs] = useState<UploadedPDF[]>([])
@@ -47,7 +39,6 @@ export function PDFUploader() {
     const [isUploading, setIsUploading] = useState(false)
     const [showReader, setShowReader] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
-<<<<<<< HEAD
     // Load existing PDFs from DB on mount
     const fetchPdfs = useCallback(async () => {
         try {
@@ -74,9 +65,6 @@ export function PDFUploader() {
     useEffect(() => {
         fetchPdfs()
     }, [fetchPdfs])
-
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
 
 
@@ -106,25 +94,22 @@ export function PDFUploader() {
             clearInterval(progressInterval)
             setUploadProgress(100)
 
-            if (response.ok) {
-                const result = await response.json()
-                const newPDF: UploadedPDF = {
-                    id: result.id,
-                    filename: result.filename,
-                    pages: result.pages,
-                    content: result.content,
-                    summary: result.summary,
-                    uploadDate: result.uploadDate
-                }
-                setUploadedPDFs(prev => [newPDF, ...prev])
-<<<<<<< HEAD
-                // notify other parts of the app (e.g., ChatDashboard) to refresh their PDF lists
-                window.dispatchEvent(new CustomEvent('pdfs:updated', { detail: { id: result.id } }))
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
-            } else {
+            if (!response.ok) {
                 throw new Error('Upload failed')
             }
+
+            const result = await response.json()
+            const newPDF: UploadedPDF = {
+                id: result.id,
+                filename: result.filename,
+                pages: result.pages,
+                content: result.content,
+                summary: result.summary,
+                uploadDate: result.uploadDate
+            }
+
+            setUploadedPDFs(prev => [newPDF, ...prev])
+            window.dispatchEvent(new CustomEvent('pdfs:updated', { detail: { id: result.id } }))
         } catch (error) {
             console.error('Error uploading PDF:', error)
         } finally {
@@ -209,14 +194,11 @@ export function PDFUploader() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-<<<<<<< HEAD
                         <div className="flex justify-end mb-3">
                             <Button size="sm" variant="outline" onClick={fetchPdfs}>
                                 {t('pdf.library.refresh', 'Refresh')}
                             </Button>
                         </div>
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             <AnimatePresence>
                                 {uploadedPDFs.map((pdf, index) => (

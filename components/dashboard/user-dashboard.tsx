@@ -1,19 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PDFUploader } from '@/components/pdf/PDFUploader'
 import ChatDashboard from '@/components/chat/ChatDashboard'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
-import { useTranslation } from 'react-i18next'
-// import { User } from '@supabase/supabase-js'
-
-interface User {
-    id: string
-    email?: string
-    user_metadata?: any
-}
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -21,20 +14,13 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     FaBook as Book,
-    FaChartLine as TrendingUp,
     FaTrophy as Trophy,
-    FaClock as Clock,
     FaBullseye as Target,
     FaUsers as Users,
     FaBookmark as Bookmark,
-    FaStar as Star,
-    FaChevronRight as ChevronRight,
     FaFire as Flame,
     FaBolt as Zap,
-    FaAward as Award,
-    FaCalendar as Calendar,
     FaBookOpen as BookOpen,
-    FaEye as Eye,
     FaSignOutAlt as LogOut
 } from 'react-icons/fa'
 import { FadeInAnimation, StaggerAnimation, StaggerItem, ScaleAnimation } from '@/components/animations/layout-animations'
@@ -42,7 +28,8 @@ import { ShineEffect } from '@/components/animations/micro-animations'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { FileText, MessageCircle, Languages, Brain } from 'lucide-react'
+import { FileText, MessageCircle, Brain } from 'lucide-react'
+import Image from 'next/image'
 
 interface UserStats {
     booksRead: number
@@ -68,29 +55,31 @@ interface RecentBook {
     totalPages: number
 }
 
+interface BookResponse {
+    id: string
+    title: string
+    author: string
+    coverImageUrl: string
+    totalPages?: number
+}
+
 export function UserDashboard() {
-    const [user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<SupabaseUser | null>(null)
     const [stats, setStats] = useState<UserStats | null>(null)
     const [recentBooks, setRecentBooks] = useState<RecentBook[]>([])
     const [loading, setLoading] = useState(true)
     const router = useRouter()
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
-    useEffect(() => {
-        checkUser()
-        loadUserStats()
-        loadRecentBooks()
-    }, [])
-
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
         setUser(user)
         if (!user) {
             router.push('/login')
         }
-    }
+    }, [router, supabase])
 
-    const loadUserStats = async () => {
+    const loadUserStats = useCallback(async () => {
         try {
             const response = await fetch('/api/user/stats')
             if (response.ok) {
@@ -102,23 +91,34 @@ export function UserDashboard() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
 
-    const loadRecentBooks = async () => {
+    const loadRecentBooks = useCallback(async () => {
         try {
             const response = await fetch('/api/books?limit=4')
             if (response.ok) {
-                const books = await response.json()
-                setRecentBooks(books.slice(0, 4).map((book: any) => ({
-                    ...book,
-                    progress: Math.floor(Math.random() * 100),
-                    totalPages: book.totalPages || 300
-                })))
+                const books: BookResponse[] = await response.json()
+                setRecentBooks(
+                    books.slice(0, 4).map((book) => ({
+                        id: book.id,
+                        title: book.title,
+                        author: book.author,
+                        coverImageUrl: book.coverImageUrl,
+                        progress: Math.floor(Math.random() * 100),
+                        totalPages: book.totalPages ?? 300
+                    }))
+                )
             }
         } catch (error) {
             console.error('Error loading recent books:', error)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        checkUser()
+        loadUserStats()
+        loadRecentBooks()
+    }, [checkUser, loadUserStats, loadRecentBooks])
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
@@ -210,7 +210,7 @@ export function UserDashboard() {
             {/* Stats Grid */}
             <StaggerAnimation>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {statCards.map((stat, index) => (
+                    {statCards.map((stat) => (
                         <StaggerItem key={stat.title}>
                             <ScaleAnimation>
                                 <Card className="relative overflow-hidden">
@@ -260,10 +260,12 @@ export function UserDashboard() {
                                             <Card className="h-full">
                                                 <CardContent className="p-4">
                                                     <div className="aspect-[3/4] mb-3 relative overflow-hidden rounded-md">
-                                                        <img
-                                                            src={book.coverImageUrl}
+                                                        <Image
+                                                            src={book.coverImageUrl || '/placeholder.jpg'}
                                                             alt={book.title}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                            fill
+                                                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 200px"
+                                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                                                         />
                                                     </div>
                                                     <h3 className="font-semibold text-sm truncate">{book.title}</h3>

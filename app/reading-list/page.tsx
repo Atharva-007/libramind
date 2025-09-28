@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,7 @@ import { ModernNavigation } from '@/components/navigation/modern-navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 interface BookType {
     id: string
@@ -25,27 +26,16 @@ export default function ReadingListPage() {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedGenre, setSelectedGenre] = useState<string>('all')
-    const [user, setUser] = useState<any>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [userBookmarks, setUserBookmarks] = useState<string[]>([])
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
-    useEffect(() => {
-        checkUser()
-        loadBooks()
-    }, [])
-
-    useEffect(() => {
-        if (user) {
-            loadUserBookmarks()
-        }
-    }, [user])
-
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
         setUser(user)
-    }
+    }, [supabase])
 
-    const loadBooks = async () => {
+    const loadBooks = useCallback(async () => {
         try {
             const response = await fetch('/api/books')
             if (response.ok) {
@@ -57,9 +47,9 @@ export default function ReadingListPage() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
 
-    const loadUserBookmarks = async () => {
+    const loadUserBookmarks = useCallback(async () => {
         try {
             const response = await fetch('/api/user-bookmarks')
             if (response.ok) {
@@ -69,13 +59,24 @@ export default function ReadingListPage() {
         } catch (error) {
             console.error('Error loading bookmarks:', error)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        checkUser()
+        loadBooks()
+    }, [checkUser, loadBooks])
+
+    useEffect(() => {
+        if (user) {
+            loadUserBookmarks()
+        }
+    }, [user, loadUserBookmarks])
 
     const toggleBookmark = async (bookId: string) => {
         if (!user) return
 
         const isCurrentlyBookmarked = userBookmarks.includes(bookId)
-        
+
         try {
             const response = await fetch('/api/bookmarks', {
                 method: isCurrentlyBookmarked ? 'DELETE' : 'POST',
@@ -86,8 +87,8 @@ export default function ReadingListPage() {
             })
 
             if (response.ok) {
-                setUserBookmarks(prev => 
-                    isCurrentlyBookmarked 
+                setUserBookmarks(prev =>
+                    isCurrentlyBookmarked
                         ? prev.filter(id => id !== bookId)
                         : [...prev, bookId]
                 )
@@ -99,7 +100,7 @@ export default function ReadingListPage() {
 
     const filteredBooks = books.filter(book => {
         const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            book.author.toLowerCase().includes(searchQuery.toLowerCase())
+            book.author.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesGenre = selectedGenre === 'all' || book.genre.toLowerCase() === selectedGenre.toLowerCase()
         return matchesSearch && matchesGenre
     })
@@ -124,7 +125,7 @@ export default function ReadingListPage() {
     return (
         <div className="min-h-screen bg-background">
             <ModernNavigation />
-            
+
             <main className="pt-20 pb-12">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
@@ -147,8 +148,8 @@ export default function ReadingListPage() {
                                     />
                                 </div>
                                 <div className="md:w-48">
-                                    <select 
-                                        value={selectedGenre} 
+                                    <select
+                                        value={selectedGenre}
                                         onChange={(e) => setSelectedGenre(e.target.value)}
                                         className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md"
                                         title="Filter by genre"
@@ -211,7 +212,7 @@ export default function ReadingListPage() {
                                         <p className="text-sm text-muted-foreground">
                                             👤 {book.author}
                                         </p>
-                                        
+
                                         <div className="flex items-center gap-2">
                                             <Badge variant="secondary" className="text-xs">
                                                 {book.genre}
@@ -234,10 +235,10 @@ export default function ReadingListPage() {
                                                 👁️ Read Book
                                             </Link>
                                         </Button>
-                                        
+
                                         {user && (
-                                            <Button 
-                                                variant="outline" 
+                                            <Button
+                                                variant="outline"
                                                 size="sm"
                                                 className="w-full"
                                                 onClick={() => toggleBookmark(book.id)}
@@ -259,8 +260,8 @@ export default function ReadingListPage() {
                                 <p className="text-muted-foreground mb-4">
                                     Try adjusting your search or filter criteria
                                 </p>
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     onClick={() => {
                                         setSearchQuery('')
                                         setSelectedGenre('all')

@@ -48,7 +48,7 @@ const navigationItems = [
     { href: '/challenges', label: 'Challenges', icon: Trophy },
     { href: '/community', label: 'Community', icon: MessageSquare },
     { href: '/profile', label: 'Profile', icon: User },
-    { href: '/settings', label: 'Settings', icon: Settings },
+    { href: '/settings', label: 'Profile Settings', icon: Settings },
 ]
 
 export function ModernNavigation() {
@@ -234,7 +234,7 @@ export function ModernNavigation() {
                                 <DropdownMenuItem asChild>
                                     <Link href="/settings" className="flex items-center">
                                         <Settings className="mr-2 h-4 w-4" />
-                                        <span>Settings</span>
+                                        <span>Profile Settings</span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />

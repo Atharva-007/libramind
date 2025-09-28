@@ -6,11 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '')
 
 export async function POST(request: NextRequest) {
     try {
-<<<<<<< HEAD
         const { message, chatId, userId, pdfId } = await request.json()
-=======
-    const { message, chatId, userId, pdfId } = await request.json()
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
         if (!message || !userId) {
             return NextResponse.json(
@@ -38,11 +34,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get conversation context if chatId exists
-<<<<<<< HEAD
         let conversationContext: { role: 'user' | 'assistant'; content: string }[] = []
-=======
-    let conversationContext: { role: 'user' | 'assistant'; content: string }[] = []
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
         if (chatId) {
             const { data: messages } = await supabase
                 .from('chat_messages')
@@ -115,11 +107,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get Gemini AI response
-<<<<<<< HEAD
         const model = genAI.getGenerativeModel({ model: "gemini-pro" })
-=======
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
         // Build conversation context for Gemini
         let conversationText = systemPrompt + '\n\n'

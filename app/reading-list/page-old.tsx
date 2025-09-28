@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Select,
     SelectContent,
@@ -17,22 +16,22 @@ import {
 } from '@/components/ui/select'
 import {
     Search,
-    Filter,
     Bookmark,
     Star,
     Book,
-    Heart,
     Eye,
-    Clock,
     BookOpen,
-    Award
+    Share,
+    Plus,
+    Grid,
+    List
 } from 'lucide-react'
 import { ModernNavigation } from '@/components/navigation/modern-navigation'
 import { FadeInAnimation, StaggerAnimation, StaggerItem, ScaleAnimation } from '@/components/animations/layout-animations'
 import { ShineEffect } from '@/components/animations/micro-animations'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface Book {
     id: string
@@ -137,7 +136,7 @@ export default function EnhancedReadingListPage() {
     }, [])
 
     const filteredAndSortedBooks = useMemo(() => {
-        let filtered = books.filter(book => {
+        const filtered = books.filter(book => {
             const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 book.author.toLowerCase().includes(searchQuery.toLowerCase())
             const matchesGenre = selectedGenre === 'all' || book.genre === selectedGenre
@@ -210,8 +209,8 @@ export default function EnhancedReadingListPage() {
                                         whileTap={{ scale: 0.9 }}
                                         onClick={() => toggleBookmark(book.id)}
                                         className={`p-2 rounded-full backdrop-blur-sm ${book.isBookmarked
-                                                ? 'bg-yellow-500 text-white'
-                                                : 'bg-white/80 text-gray-700 hover:bg-white'
+                                            ? 'bg-yellow-500 text-white'
+                                            : 'bg-white/80 text-gray-700 hover:bg-white'
                                             } transition-colors`}
                                     >
                                         <Bookmark className="w-4 h-4" />
@@ -363,8 +362,8 @@ export default function EnhancedReadingListPage() {
                                             whileTap={{ scale: 0.9 }}
                                             onClick={() => toggleBookmark(book.id)}
                                             className={`p-1 rounded transition-colors ${book.isBookmarked
-                                                    ? 'text-yellow-500'
-                                                    : 'text-muted-foreground hover:text-foreground'
+                                                ? 'text-yellow-500'
+                                                : 'text-muted-foreground hover:text-foreground'
                                                 }`}
                                         >
                                             <Bookmark className="w-4 h-4" />

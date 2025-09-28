@@ -1,10 +1,6 @@
 'use client'
 
-<<<<<<< HEAD
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-=======
-import { useState, useEffect, useRef, useCallback } from 'react'
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -15,10 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-<<<<<<< HEAD
 import { useToast } from '@/hooks/use-toast'
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
 interface Message {
     id: string
@@ -36,7 +29,6 @@ interface ChatSession {
     unreadCount: number
 }
 
-<<<<<<< HEAD
 type ChatMessageRow = {
     id: string
     content: string | null
@@ -52,9 +44,6 @@ type ChatSessionRow = {
     updated_at: string | null
     unread_count: number | null
 }
-
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 export default function ChatDashboard() {
     const { user } = useUser()
     const [messages, setMessages] = useState<Message[]>([])
@@ -66,7 +55,6 @@ export default function ChatDashboard() {
     const [selectedPdfId, setSelectedPdfId] = useState<string | 'none'>('none')
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
-<<<<<<< HEAD
     const { toast } = useToast()
     const didInitContextRef = useRef(false)
 
@@ -74,8 +62,6 @@ export default function ChatDashboard() {
         if (selectedPdfId === 'none') return null
         return pdfs.find(p => p.id === selectedPdfId)?.filename ?? null
     }, [pdfs, selectedPdfId])
-=======
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -94,7 +80,6 @@ export default function ChatDashboard() {
                 .order('created_at', { ascending: true })
 
             if (error) throw error
-<<<<<<< HEAD
             const rows = (data ?? []) as ChatMessageRow[]
             const normalized = rows.map((row) => ({
                 id: row.id,
@@ -104,9 +89,6 @@ export default function ChatDashboard() {
                 type: (row.message_type as Message['type']) || 'text'
             }))
             setMessages(normalized)
-=======
-            setMessages(data || [])
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
         } catch (error) {
             console.error('Error loading messages:', error)
         }
@@ -121,7 +103,6 @@ export default function ChatDashboard() {
                 .order('updated_at', { ascending: false })
 
             if (error) throw error
-<<<<<<< HEAD
             const rows = (data ?? []) as ChatSessionRow[]
             const normalized = rows.map((row) => ({
                 id: row.id,
@@ -135,13 +116,6 @@ export default function ChatDashboard() {
             if (normalized.length > 0 && !activeChatId) {
                 setActiveChatId(normalized[0].id)
                 loadMessages(normalized[0].id)
-=======
-            setChatSessions(data || [])
-
-            if (data && data.length > 0 && !activeChatId) {
-                setActiveChatId(data[0].id)
-                loadMessages(data[0].id)
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
             }
         } catch (error) {
             console.error('Error loading chat sessions:', error)
@@ -155,14 +129,7 @@ export default function ChatDashboard() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, loadChatSessions])
-
-
-
-<<<<<<< HEAD
     const loadUserPdfs = useCallback(async () => {
-=======
-    const loadUserPdfs = async () => {
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
         try {
             const { data, error } = await supabase
                 .from('user_pdfs')
@@ -172,7 +139,6 @@ export default function ChatDashboard() {
                 .limit(50)
 
             if (error) throw error
-<<<<<<< HEAD
             const list = data || []
             setPdfs(list)
             // Auto-select most recent PDF if none selected yet
@@ -217,13 +183,6 @@ export default function ChatDashboard() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPdfId, selectedPdfName])
-=======
-            setPdfs(data || [])
-        } catch (error) {
-            console.error('Error loading PDFs:', error)
-        }
-    }
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
 
     const sendMessage = async () => {
         if (!inputMessage.trim() || !user || isLoading) return
@@ -441,7 +400,6 @@ export default function ChatDashboard() {
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                     Always ready to help with your reading journey
                                 </p>
-<<<<<<< HEAD
                                 <div className="mt-1 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                                     <File className="w-3 h-3" />
                                     {selectedPdfName ? (
@@ -456,12 +414,20 @@ export default function ChatDashboard() {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
-=======
+                                <div className="mt-1 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                    <File className="w-3 h-3" />
+                                    {selectedPdfName ? (
+                                        <span>
+                                            Using context: <span className="font-medium text-gray-800 dark:text-gray-200">{selectedPdfName}</span>
+                                        </span>
+                                    ) : (
+                                        <span>No PDF context</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="hidden md:flex items-center gap-2">
->>>>>>> 0333f2e2cb2fb723e26e52b6fa545f3fcf439a49
+                            <div className="flex items-center gap-2">
                                 <File className="w-4 h-4 text-muted-foreground" />
                                 <Select value={selectedPdfId} onValueChange={(v) => setSelectedPdfId(v as 'none' | string)}>
                                     <SelectTrigger className="min-w-[220px]">
